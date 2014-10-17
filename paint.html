@@ -1,17 +1,203 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-    <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+
+		.white { background-color: rgb(255,255,255); }
+		.black { background-color: rgb(0,0,0); }
+		.purple { background-color: rgb(128,6,125); }
+		.pink { background-color: rgb(247,19,163); }
+		.red { background-color: rgb(237,6,33); }
+		.ruddle { background-color: rgb(160,1,44); }
+		.yellow { background-color: rgb(250,234,21); }
+		.orange { background-color: rgb(253,169,25); }
+		.lightblue { background-color: rgb(172,233,248); }
+		.blue { background-color: rgb(20,178,221); }
+		.darkblue { background-color: rgb(5,63,155); }
+		.uvgreen { background-color: rgb(148,209,17); }
+		.green { background-color: rgb(144,184,29); }
+		.darkgreen  { background-color: rgb(17,167,59); }
+
+		#canvas {
+			border: 1px solid red;
+		}
+
+		#brushColors a,
+		#shadowColors a {
+			display: inline-block;
+			width: 60px;
+			height: 60px;
+			text-indent: -999px;
+		}
+
+	</style>
+	<script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+
+
+		$(function(){
+
+			var canvas,
+				context,
+				drawing = false,
+				drawLineTo = 0,
+				prevDotCoords,
+
+				// Colors
+
+				brush_color = { r: 0, g: 0, b: 0 },
+				shadow_color = { r: 0, g: 0, b: 0 };
+
+
+			$('#brushColors, #shadowColors').find('a').on('click', function(e){
+				e.preventDefault();
+
+				var data_attr = $(this).data(),
+					brush_data = Object.keys(data_attr)[0];
+
+
+				var split = $(this).data(brush_data).split(',');
+
+
+				if ( brush_data === "brush_color" ) {
+
+					brush_color.r = split[0];
+					brush_color.g = split[1];
+					brush_color.b = split[2];
+				}
+
+				if ( brush_data === "shadow_color" ){
+					shadow_color.r = split[0];
+					shadow_color.g = split[1];
+					shadow_color.b = split[2];
+				}
+		
+			});
+
+
+			function getMousePosRelative(element, event) {
+
+				var elementPos = element.getBoundingClientRect(element);
+
+				return relativePos = {
+					x: event.clientX - elementPos.left,
+					y: event.clientY - elementPos.top
+				}
+			}
+
+			function drawLine(event) {
+
+				var position = getMousePosRelative(canvas, event);
+				
+				drawLineTo += 1;
+
+				if ( drawLineTo > 1 ) {
+					LineTo(position.x, position.y);
+				}
+			}
+
+			function LineTo(x, y) {
+
+				context.moveTo(prevDotCoords.x, prevDotCoords.y);
+				context.lineTo(x, y);
+				context.lineWidth = 10;
+				context.lineJoin = context.lineCap = "round";
+				context.shadowBlur = 5;
+				context.shadowColor = 'rgb(' + shadow_color.r + ', ' + shadow_color.g + ', ' + shadow_color.b + ')';
+				context.strokeStyle = 'rgb(' + brush_color.r + ', ' + brush_color.g + ', ' + brush_color.b + ')';
+				context.stroke();
+
+				prevDotCoords.x = prevDotCoords.x;
+				prevDotCoords.y = prevDotCoords.y;
+			}
+
+			(function(){
+
+				canvas = document.getElementById('canvas');
+
+				context = canvas.getContext('2d');
+
+
+				var socket = io('http://localhost');
+
+
+				socket.on('cursorMove', function (data) {
+
+					console.log(data.positions);
+
+					if ( drawing ){
+
+						drawLine(e);
+						prevDotCoords = getMousePosRelative(this, e);
+					}
+				});
+
+				$(canvas).on('mousedown', function(e){
+					drawing = true;
+					context.beginPath();
+					prevDotCoords = getMousePosRelative(this, e);
+				});
+
+				$(canvas).on('mouseup', function(e){
+					drawing = false;
+					context.closePath();
+				});
+
+/*				$(canvas).on('mousemove', function(e){
+
+					if ( drawing ){
+
+						drawLine(e);
+						prevDotCoords = getMousePosRelative(this, e);
+					}
+				});*/
+
+			}());
+
+		});
+
+	</script>
 </head>
 <body>
-    <p>Rajzolós játék</p>
-    <script>
-        var socket = io('http://localhost');
-        socket.on('cursorMove', function (data) {
-            console.log(data.positions);
-        });
-    </script>
+	<canvas id="canvas" width="1000" height="850"></canvas>
+	<div id="options">
+		<section id="brushColors">
+			<h2>Ecset szín</h2>
+			<a href="#" class="white" data-brush_color="255,255,255">fehér</a>
+			<a href="#" class="black" data-brush_color="0,0,0">fekete</a>
+			<a href="#" class="purple" data-brush_color="128,6,125">lila</a>
+			<a href="#" class="pink" data-brush_color="247,19,163">rózsaszín</a>
+			<a href="#" class="red" data-brush_color="237,6,33">piros</a>
+			<a href="#" class="ruddle" data-brush_color="160,1,44">vörös</a>
+			<a href="#" class="yellow" data-brush_color="250,234,21">sárga</a>
+			<a href="#" class="orange" data-brush_color="253,169,25">narancs</a>
+			<a href="#" class="lightblue" data-brush_color="172,233,248">világoskék</a>
+			<a href="#" class="blue" data-brush_color="20,178,221">kék</a>
+			<a href="#" class="darkblue" data-brush_color="5,63,155">sötétkék</a>
+			<a href="#" class="uvgreen" data-brush_color="148,209,17">UV zöld</a>
+			<a href="#" class="green" data-brush_color="144,184,29">zöld</a>
+			<a href="#" class="darkgreen" data-brush_color="17,167,59">sötétzöld</a>
+		</section>
+		<section id="shadowColors">
+			<h2>Árnyék szín</h2>
+			<a href="#" class="white" data-shadow_color="255,255,255">fehér</a>
+			<a href="#" class="black" data-shadow_color="0,0,0">fekete</a>
+			<a href="#" class="purple" data-shadow_color="128,6,125">lila</a>
+			<a href="#" class="pink" data-shadow_color="247,19,163">rózsaszín</a>
+			<a href="#" class="red" data-shadow_color="237,6,33">piros</a>
+			<a href="#" class="ruddle" data-shadow_color="160,1,44">vörös</a>
+			<a href="#" class="yellow" data-shadow_color="250,234,21">sárga</a>
+			<a href="#" class="orange" data-shadow_color="253,169,25">narancs</a>
+			<a href="#" class="lightblue" data-shadow_color="172,233,248">világoskék</a>
+			<a href="#" class="blue" data-shadow_color="20,178,221">kék</a>
+			<a href="#" class="darkblue" data-shadow_color="5,63,155">sötétkék</a>
+			<a href="#" class="uvgreen" data-shadow_color="148,209,17">UV zöld</a>
+			<a href="#" class="green" data-shadow_color="144,184,29">zöld</a>
+			<a href="#" class="darkgreen" data-shadow_color="17,167,59">sötétzöld</a>
+		</section>
+	</div>
 </body>
 </html>
