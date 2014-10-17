@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+    <link rel="stylesheet" href="/games/cat/cat.css">
+</head>
+<body>
+    <p>Rajzolós játék</p>
+    <script>
+        var socket = io('http://localhost');
+        socket.on('cursorMove', function (data) {
+            console.log(data.positions);
+        });
+    </script>
+    <!--
+    table>tr*99>(td>{$})+(td>.sprite-$)
+    -->
+    <table>
+    <tr>
+        <td>1</td>
+        <td>
+            <div class="sprite-1">&nbsp;</div>
+        </td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>
+            <div class="sprite-2"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>
+            <div class="sprite-3"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>
+            <div class="sprite-4"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>
+            <div class="sprite-5"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>
+            <div class="sprite-6"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>
+            <div class="sprite-7"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>
+            <div class="sprite-8"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>
+            <div class="sprite-9"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td>
+            <div class="sprite-10"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>11</td>
+        <td>
+            <div class="sprite-11"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>12</td>
+        <td>
+            <div class="sprite-12"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>13</td>
+        <td>
+            <div class="sprite-13"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>14</td>
+        <td>
+            <div class="sprite-14"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>15</td>
+        <td>
+            <div class="sprite-15"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>16</td>
+        <td>
+            <div class="sprite-16"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>17</td>
+        <td>
+            <div class="sprite-17"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>18</td>
+        <td>
+            <div class="sprite-18"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>19</td>
+        <td>
+            <div class="sprite-19"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>20</td>
+        <td>
+            <div class="sprite-20"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>21</td>
+        <td>
+            <div class="sprite-21"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>22</td>
+        <td>
+            <div class="sprite-22"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>23</td>
+        <td>
+            <div class="sprite-23"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>24</td>
+        <td>
+            <div class="sprite-24"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>25</td>
+        <td>
+            <div class="sprite-25"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>26</td>
+        <td>
+            <div class="sprite-26"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>27</td>
+        <td>
+            <div class="sprite-27"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>28</td>
+        <td>
+            <div class="sprite-28"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>29</td>
+        <td>
+            <div class="sprite-29"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>30</td>
+        <td>
+            <div class="sprite-30"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>31</td>
+        <td>
+            <div class="sprite-31"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>32</td>
+        <td>
+            <div class="sprite-32"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>33</td>
+        <td>
+            <div class="sprite-33"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>34</td>
+        <td>
+            <div class="sprite-34"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>35</td>
+        <td>
+            <div class="sprite-35"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>36</td>
+        <td>
+            <div class="sprite-36"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>37</td>
+        <td>
+            <div class="sprite-37"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>38</td>
+        <td>
+            <div class="sprite-38"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>39</td>
+        <td>
+            <div class="sprite-39"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>40</td>
+        <td>
+            <div class="sprite-40"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>41</td>
+        <td>
+            <div class="sprite-41"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>42</td>
+        <td>
+            <div class="sprite-42"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>43</td>
+        <td>
+            <div class="sprite-43"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>44</td>
+        <td>
+            <div class="sprite-44"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>45</td>
+        <td>
+            <div class="sprite-45"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>46</td>
+        <td>
+            <div class="sprite-46"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>47</td>
+        <td>
+            <div class="sprite-47"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>48</td>
+        <td>
+            <div class="sprite-48"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>49</td>
+        <td>
+            <div class="sprite-49"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>50</td>
+        <td>
+            <div class="sprite-50"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>51</td>
+        <td>
+            <div class="sprite-51"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>52</td>
+        <td>
+            <div class="sprite-52"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>53</td>
+        <td>
+            <div class="sprite-53"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>54</td>
+        <td>
+            <div class="sprite-54"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>55</td>
+        <td>
+            <div class="sprite-55"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>56</td>
+        <td>
+            <div class="sprite-56"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>57</td>
+        <td>
+            <div class="sprite-57"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>58</td>
+        <td>
+            <div class="sprite-58"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>59</td>
+        <td>
+            <div class="sprite-59"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>60</td>
+        <td>
+            <div class="sprite-60"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>61</td>
+        <td>
+            <div class="sprite-61"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>62</td>
+        <td>
+            <div class="sprite-62"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>63</td>
+        <td>
+            <div class="sprite-63"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>64</td>
+        <td>
+            <div class="sprite-64"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>65</td>
+        <td>
+            <div class="sprite-65"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>66</td>
+        <td>
+            <div class="sprite-66"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>67</td>
+        <td>
+            <div class="sprite-67"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>68</td>
+        <td>
+            <div class="sprite-68"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>69</td>
+        <td>
+            <div class="sprite-69"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>70</td>
+        <td>
+            <div class="sprite-70"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>71</td>
+        <td>
+            <div class="sprite-71"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>72</td>
+        <td>
+            <div class="sprite-72"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>73</td>
+        <td>
+            <div class="sprite-73"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>74</td>
+        <td>
+            <div class="sprite-74"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>75</td>
+        <td>
+            <div class="sprite-75"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>76</td>
+        <td>
+            <div class="sprite-76"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>77</td>
+        <td>
+            <div class="sprite-77"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>78</td>
+        <td>
+            <div class="sprite-78"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>79</td>
+        <td>
+            <div class="sprite-79"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>80</td>
+        <td>
+            <div class="sprite-80"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>81</td>
+        <td>
+            <div class="sprite-81"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>82</td>
+        <td>
+            <div class="sprite-82"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>83</td>
+        <td>
+            <div class="sprite-83"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>84</td>
+        <td>
+            <div class="sprite-84"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>85</td>
+        <td>
+            <div class="sprite-85"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>86</td>
+        <td>
+            <div class="sprite-86"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>87</td>
+        <td>
+            <div class="sprite-87"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>88</td>
+        <td>
+            <div class="sprite-88"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>89</td>
+        <td>
+            <div class="sprite-89"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>90</td>
+        <td>
+            <div class="sprite-90"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>91</td>
+        <td>
+            <div class="sprite-91"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>92</td>
+        <td>
+            <div class="sprite-92"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>93</td>
+        <td>
+            <div class="sprite-93"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>94</td>
+        <td>
+            <div class="sprite-94"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>95</td>
+        <td>
+            <div class="sprite-95"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>96</td>
+        <td>
+            <div class="sprite-96"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>97</td>
+        <td>
+            <div class="sprite-97"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>98</td>
+        <td>
+            <div class="sprite-98"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>99</td>
+        <td>
+            <div class="sprite-99"></div>
+        </td>
+    </tr>
+    </table>
+</body>
+</html>

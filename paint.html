@@ -8,8 +8,11 @@
 <body>
     <p>Rajzolós játék</p>
     <script>
-        var socket = io('http://localhost');
+        var socket = io('http://192.168.62.208');
         socket.on('cursorMove', function (data) {
+            if(typeof data === 'string'){
+                data = JSON.parse(data);
+            }
             console.log(data.positions);
         });
     </script>

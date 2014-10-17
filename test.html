@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Laser Madness tester</title>
+    <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <script>
+        var socket = io('http://192.168.62.208');
+
+        $(document).on('mousemove', function (event) {
+            socket.emit('test', JSON.stringify({
+                "positions": [
+                    {
+                        "x": event.pageX,
+                        "y": event.pageY
+                    }
+                ]
+            }));
+        });
+    </script>
+    <style>
+        html, body{
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+</body>
+</html>
