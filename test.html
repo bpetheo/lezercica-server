@@ -13,8 +13,8 @@
             socket.emit('test', JSON.stringify({
                 "positions": [
                     {
-                        "x": event.pageX,
-                        "y": event.pageY
+                        "x": (event.pageX / $(document).width()) * 100,
+                        "y": (event.pageY / $(document).height()) * 100
                     }
                 ]
             }));

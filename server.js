@@ -9,16 +9,16 @@ var
 
 var HTTPPORT = 12345;
 var UDPPORT = 12346;
-var HTTPHOST = '127.0.0.1';
-var UDPHOST = '192.168.62.208';
+var HOST = '192.168.62.208';
+var timeout = null;
 
 
 // UDP client
 udpServer.on('message', function (message, remote) {
     console.log(remote.address + ':' + remote.port + ' - ' + message);
-    sendPositions(JSON.parse(message));
+    sendPosition(message);
 });
-udpServer.bind(UDPPORT, UDPHOST);
+udpServer.bind(UDPPORT, HOST);
 console.log('UDP Client running at http://127.0.0.1:' + UDPPORT + '/');
 
 
@@ -26,28 +26,39 @@ console.log('UDP Client running at http://127.0.0.1:' + UDPPORT + '/');
 function httpServerHandler(req, res) {
     response(req, res, getMime(url.parse(req.url).pathname));
 }
-app.listen(HTTPPORT, UDPHOST);
+app.listen(HTTPPORT, HOST);
 console.log('Server running at http://127.0.0.1:' + HTTPPORT + '/');
 
 
 // Socket.io
 var socketToEmit = null;
-function sendPositions(data) {
+function send(message, data) {
     if (socketToEmit) {
         console.log('sending data:', typeof data, data);
-        socketToEmit.emit('cursorMove', data);
-        console.log('Coordinates sent');
+        socketToEmit.emit(message, data);
+        //console.log('Coordinates sent');
     } else {
         console.error('Socket connection is not established! Data not sent...');
     }
+}
+function sendPosition(data){
+    send('cursorMove', JSON.parse(data));
+
+    if(timeout){
+        clearTimeout(timeout);
+    }
+    timeout = setTimeout(function(){
+        send('mouseUp', +(new Date));
+        console.log('Mouse movement ended');
+    }, 1000);
 }
 io.on('connection', function (socket) {
     socketToEmit = socket;
     console.log('Client detected. Socket tunnel is now open.');
 
     socket.on('test', function(data){
-        console.log('got test request:', typeof data, data);
-        sendPositions(data);
+        //console.log('got test request:', typeof data, data);
+        sendPosition(data);
     })
 });
 console.log('Socket IO running');
