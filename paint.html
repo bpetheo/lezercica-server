@@ -20,12 +20,29 @@
 		.green { background-color: rgb(144,184,29); }
 		.darkgreen  { background-color: rgb(17,167,59); }
 
+		#fade {
+			display: none;
+			content: '';
+			position: absolute;
+			z-index: 1;
+			width: 60px;
+			height: 60px;
+			border-radius: 3px;
+			background-color: rgba(255, 255, 255, .5);
+		}
+
+		#fade:hover {
+			height: 0;
+			transation: 5s height;
+		}
+
 		body {
 			overflow: hidden;
 		}
 
 		#brushColors a,
 		#shadowColors a {
+			position: relative;
 			display: inline-block;
 			width: 60px;
 			height: 60px;
@@ -37,6 +54,24 @@
 			background-repeat: no-repeat;
 			background-position: 0 0;
 		}
+
+/* 		#brushColors a:before,
+#shadowColors a:before {
+	display: none;
+	content: '';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(255, 255, 255, .5);
+}
+
+#options a:hover {
+	display: block;
+	top: -60px;
+	transition: 5s top;
+} */
 
 /* 		#options {
 	position: absolute;
@@ -55,6 +90,7 @@
 		$(function(){
 
 			var canvas = document.getElementById('canvas'),
+				fade = document.getElementById('fade'),
 				context,
 				drawing = false,
 				drawLineTo = 0,
@@ -66,6 +102,12 @@
 				shadow_color = { r: 0, g: 0, b: 0 },
 				loadColor = false;
 
+
+			function setFade(x, y){
+
+				console.log(fade)
+				$(fade).css({ top: x, left: y, display: "block" });
+			}
 
 			function setColor(colorType, color) {
 
@@ -86,6 +128,7 @@
 					shadow_color.g = rgb[1];
 					shadow_color.b = rgb[2];
 				}
+				console.log('color set');
 			}
 
 			function getMousePosRelative(element, event) {
@@ -204,13 +247,18 @@
 							var colorType = Object.keys($(element).data())[0],
 								positions = getMousePosRelative(element, event);
 
+
+
 							if ( positions.x > 0 && positions.y > 0 ) {
+								
 								setColor(colorType, loadColor);
 							}
 
-						}();
+						};
 
-					// setTimeout(settingColor, 1000);
+						// console.log($(element).position().top, $(element).position().left);
+
+					setTimeout(settingColor, 2000);
 				});
 
 			}());
@@ -222,6 +270,7 @@
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 	<canvas id="canvas"></canvas>
  	<div id="options">
+ 		<div id="fade"></div>
 		<section id="brushColors">
 			<h2>Ecset szín</h2>
 			<a href="#" class="white" data-brush_color="255,255,255">fehér</a>
