@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>XY</title>
 	<style type="text/css">
 
 		.white { background-color: rgb(255,255,255); }
@@ -20,8 +20,8 @@
 		.green { background-color: rgb(144,184,29); }
 		.darkgreen  { background-color: rgb(17,167,59); }
 
-		#canvas {
-			border: 1px solid red;
+		body {
+			overflow: hidden;
 		}
 
 		#brushColors a,
@@ -30,17 +30,31 @@
 			width: 60px;
 			height: 60px;
 			text-indent: -999px;
+			border: 1px solid #a3a7ab;
+			border-radius: 3px;
+			box-shadow: 0 3px 3px 0 #d4d4d4;
+			background-image: url(img/color.png);
+			background-repeat: no-repeat;
+			background-position: 0 0;
 		}
 
+/* 		#options {
+	position: absolute;
+	top: -9999px;
+	width: 500px;
+	left: 50%;
+	margin-left: -250px;
+} */
+
 	</style>
-	<script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+	<!-- <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script> -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script type="text/javascript">
 
 
 		$(function(){
 
-			var canvas,
+			var canvas = document.getElementById('canvas'),
 				context,
 				drawing = false,
 				drawLineTo = 0,
@@ -49,42 +63,44 @@
 				// Colors
 
 				brush_color = { r: 0, g: 0, b: 0 },
-				shadow_color = { r: 0, g: 0, b: 0 };
+				shadow_color = { r: 0, g: 0, b: 0 },
+				loadColor = false;
 
 
-			$('#brushColors, #shadowColors').find('a').on('click', function(e){
-				e.preventDefault();
+			function setColor(colorType, color) {
 
-				var data_attr = $(this).data(),
-					brush_data = Object.keys(data_attr)[0];
+				if ( colorType === "brush_color" ) {
 
+					var rgb = $('#brushColors').find('a.' + color).data('brush_color').split(',');
 
-				var split = $(this).data(brush_data).split(',');
-
-
-				if ( brush_data === "brush_color" ) {
-
-					brush_color.r = split[0];
-					brush_color.g = split[1];
-					brush_color.b = split[2];
+					brush_color.r = rgb[0];
+					brush_color.g = rgb[1];
+					brush_color.b = rgb[2];
 				}
 
-				if ( brush_data === "shadow_color" ){
-					shadow_color.r = split[0];
-					shadow_color.g = split[1];
-					shadow_color.b = split[2];
-				}
-		
-			});
+				if ( colorType === "shadow_color" ){
 
+					var rgb = $('#shadowColors').find('a.' + color).data('shadow_color').split(',');
+
+					shadow_color.r = rgb[0];
+					shadow_color.g = rgb[1];
+					shadow_color.b = rgb[2];
+				}
+			}
 
 			function getMousePosRelative(element, event) {
 
-				var elementPos = element.getBoundingClientRect(element);
+				if ( element != undefined && event != undefined ) {
 
-				return relativePos = {
-					x: event.clientX - elementPos.left,
-					y: event.clientY - elementPos.top
+					var elementPos = element.getBoundingClientRect(element);
+
+					return relativePos = {
+						x: event.clientX - elementPos.left,
+						y: event.clientY - elementPos.top
+					}
+				}
+				else {
+					return false;
 				}
 			}
 
@@ -114,17 +130,26 @@
 				prevDotCoords.y = prevDotCoords.y;
 			}
 
+			function setCanvasSize() {
+
+				var documentWidth = $( document ).width(),
+					documentHeight = $( document ).height();
+
+				canvas.width = documentWidth;
+				canvas.height = documentHeight;
+			}
+
 			(function(){
 
-				canvas = document.getElementById('canvas');
+				setCanvasSize();
 
 				context = canvas.getContext('2d');
 
 
-				var socket = io('http://localhost');
+	/*			var socket = io('http://localhost');*/
 
 
-				socket.on('cursorMove', function (data) {
+/*				socket.on('cursorMove', function (data) {
 
 					console.log(data.positions);
 
@@ -134,6 +159,7 @@
 						prevDotCoords = getMousePosRelative(this, e);
 					}
 				});
+*/
 
 				$(canvas).on('mousedown', function(e){
 					drawing = true;
@@ -146,14 +172,46 @@
 					context.closePath();
 				});
 
-/*				$(canvas).on('mousemove', function(e){
+				$(canvas).on('mouseleave', function(e){
+					drawing = false;
+					context.closePath();
+				});
+
+				$(canvas).on('mousemove', function(e){
 
 					if ( drawing ){
 
 						drawLine(e);
 						prevDotCoords = getMousePosRelative(this, e);
 					}
-				});*/
+
+					var optionPosition = getMousePosRelative(document.body, e);
+
+					if ( optionPosition.y <= 150 ) {
+						console.log(optionPosition.y);
+					}
+				});
+
+				$('#options').find('a').on('mouseover', function(e){
+
+					var element = this,
+						event = e,
+						loadColor = $(element).attr('class'),
+						positions = getMousePosRelative(this, e),
+
+						settingColor = function(){
+
+							var colorType = Object.keys($(element).data())[0],
+								positions = getMousePosRelative(element, event);
+
+							if ( positions.x > 0 && positions.y > 0 ) {
+								setColor(colorType, loadColor);
+							}
+
+						}();
+
+					// setTimeout(settingColor, 1000);
+				});
 
 			}());
 
@@ -161,9 +219,9 @@
 
 	</script>
 </head>
-<body>
-	<canvas id="canvas" width="1000" height="850"></canvas>
-	<div id="options">
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<canvas id="canvas"></canvas>
+ 	<div id="options">
 		<section id="brushColors">
 			<h2>Ecset szín</h2>
 			<a href="#" class="white" data-brush_color="255,255,255">fehér</a>
