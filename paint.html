@@ -1,20 +1,317 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-    <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>XY</title>
+	<style type="text/css">
+
+		.white { background-color: rgb(255,255,255); }
+		.black { background-color: rgb(0,0,0); }
+		.purple { background-color: rgb(128,6,125); }
+		.pink { background-color: rgb(247,19,163); }
+		.red { background-color: rgb(237,6,33); }
+		.ruddle { background-color: rgb(160,1,44); }
+		.yellow { background-color: rgb(250,234,21); }
+		.orange { background-color: rgb(253,169,25); }
+		.lightblue { background-color: rgb(172,233,248); }
+		.blue { background-color: rgb(20,178,221); }
+		.darkblue { background-color: rgb(5,63,155); }
+		.uvgreen { background-color: rgb(148,209,17); }
+		.green { background-color: rgb(144,184,29); }
+		.darkgreen  { background-color: rgb(17,167,59); }
+
+		#fade {
+			display: none;
+			content: '';
+			position: absolute;
+			z-index: 1;
+			width: 60px;
+			height: 60px;
+			border-radius: 3px;
+			background-color: rgba(255, 255, 255, .5);
+		}
+
+		#fade:hover {
+			height: 0;
+			transation: 5s height;
+		}
+
+		body {
+			overflow: hidden;
+		}
+
+		#brushColors a,
+		#shadowColors a {
+			position: relative;
+			display: inline-block;
+			width: 60px;
+			height: 60px;
+			text-indent: -999px;
+			border: 1px solid #a3a7ab;
+			border-radius: 3px;
+			box-shadow: 0 3px 3px 0 #d4d4d4;
+			background-image: url(img/color.png);
+			background-repeat: no-repeat;
+			background-position: 0 0;
+		}
+
+/* 		#brushColors a:before,
+#shadowColors a:before {
+	display: none;
+	content: '';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(255, 255, 255, .5);
+}
+
+#options a:hover {
+	display: block;
+	top: -60px;
+	transition: 5s top;
+} */
+
+/* 		#options {
+	position: absolute;
+	top: -9999px;
+	width: 500px;
+	left: 50%;
+	margin-left: -250px;
+} */
+
+	</style>
+	<!-- <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script> -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+
+
+		$(function(){
+
+			var canvas = document.getElementById('canvas'),
+				fade = document.getElementById('fade'),
+				context,
+				drawing = false,
+				drawLineTo = 0,
+				prevDotCoords,
+
+				// Colors
+
+				brush_color = { r: 0, g: 0, b: 0 },
+				shadow_color = { r: 0, g: 0, b: 0 },
+				loadColor = false;
+
+
+			function setFade(x, y){
+
+				console.log(fade)
+				$(fade).css({ top: x, left: y, display: "block" });
+			}
+
+			function setColor(colorType, color) {
+
+				if ( colorType === "brush_color" ) {
+
+					var rgb = $('#brushColors').find('a.' + color).data('brush_color').split(',');
+
+					brush_color.r = rgb[0];
+					brush_color.g = rgb[1];
+					brush_color.b = rgb[2];
+				}
+
+				if ( colorType === "shadow_color" ){
+
+					var rgb = $('#shadowColors').find('a.' + color).data('shadow_color').split(',');
+
+					shadow_color.r = rgb[0];
+					shadow_color.g = rgb[1];
+					shadow_color.b = rgb[2];
+				}
+				console.log('color set');
+			}
+
+			function getMousePosRelative(element, event) {
+
+				if ( element != undefined && event != undefined ) {
+
+					var elementPos = element.getBoundingClientRect(element);
+
+					return relativePos = {
+						x: event.clientX - elementPos.left,
+						y: event.clientY - elementPos.top
+					}
+				}
+				else {
+					return false;
+				}
+			}
+
+			function drawLine(event) {
+
+				var position = getMousePosRelative(canvas, event);
+				
+				drawLineTo += 1;
+
+				if ( drawLineTo > 1 ) {
+					LineTo(position.x, position.y);
+				}
+			}
+
+			function LineTo(x, y) {
+
+				context.moveTo(prevDotCoords.x, prevDotCoords.y);
+				context.lineTo(x, y);
+				context.lineWidth = 10;
+				context.lineJoin = context.lineCap = "round";
+				context.shadowBlur = 5;
+				context.shadowColor = 'rgb(' + shadow_color.r + ', ' + shadow_color.g + ', ' + shadow_color.b + ')';
+				context.strokeStyle = 'rgb(' + brush_color.r + ', ' + brush_color.g + ', ' + brush_color.b + ')';
+				context.stroke();
+
+				prevDotCoords.x = prevDotCoords.x;
+				prevDotCoords.y = prevDotCoords.y;
+			}
+
+			function setCanvasSize() {
+
+				var documentWidth = $( document ).width(),
+					documentHeight = $( document ).height();
+
+				canvas.width = documentWidth;
+				canvas.height = documentHeight;
+			}
+
+			(function(){
+
+				setCanvasSize();
+
+				context = canvas.getContext('2d');
+
+
+	/*			var socket = io('http://localhost');*/
+
+
+/*				socket.on('cursorMove', function (data) {
+
+					console.log(data.positions);
+ var socket = io('http://192.168.62.208');
+ socket.on('cursorMove', function (data) {
+ if(typeof data === 'string'){
+ data = JSON.parse(data);
+ }
+ console.log(data.positions);
+ });
+
+					if ( drawing ){
+
+						drawLine(e);
+						prevDotCoords = getMousePosRelative(this, e);
+					}
+				});
+*/
+
+				$(canvas).on('mousedown', function(e){
+					drawing = true;
+					context.beginPath();
+					prevDotCoords = getMousePosRelative(this, e);
+				});
+
+				$(canvas).on('mouseup', function(e){
+					drawing = false;
+					context.closePath();
+				});
+
+				$(canvas).on('mouseleave', function(e){
+					drawing = false;
+					context.closePath();
+				});
+
+				$(canvas).on('mousemove', function(e){
+
+					if ( drawing ){
+
+						drawLine(e);
+						prevDotCoords = getMousePosRelative(this, e);
+					}
+
+					var optionPosition = getMousePosRelative(document.body, e);
+
+					if ( optionPosition.y <= 150 ) {
+						console.log(optionPosition.y);
+					}
+				});
+
+				$('#options').find('a').on('mouseover', function(e){
+
+					var element = this,
+						event = e,
+						loadColor = $(element).attr('class'),
+						positions = getMousePosRelative(this, e),
+
+						settingColor = function(){
+
+							var colorType = Object.keys($(element).data())[0],
+								positions = getMousePosRelative(element, event);
+
+
+
+							if ( positions.x > 0 && positions.y > 0 ) {
+								
+								setColor(colorType, loadColor);
+							}
+
+						};
+
+						// console.log($(element).position().top, $(element).position().left);
+
+					setTimeout(settingColor, 2000);
+				});
+
+			}());
+
+		});
+
+	</script>
 </head>
-<body>
-    <p>Rajzolós játék</p>
-    <script>
-        var socket = io('http://192.168.62.208');
-        socket.on('cursorMove', function (data) {
-            if(typeof data === 'string'){
-                data = JSON.parse(data);
-            }
-            console.log(data.positions);
-        });
-    </script>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<canvas id="canvas"></canvas>
+ 	<div id="options">
+ 		<div id="fade"></div>
+		<section id="brushColors">
+			<h2>Ecset szín</h2>
+			<a href="#" class="white" data-brush_color="255,255,255">fehér</a>
+			<a href="#" class="black" data-brush_color="0,0,0">fekete</a>
+			<a href="#" class="purple" data-brush_color="128,6,125">lila</a>
+			<a href="#" class="pink" data-brush_color="247,19,163">rózsaszín</a>
+			<a href="#" class="red" data-brush_color="237,6,33">piros</a>
+			<a href="#" class="ruddle" data-brush_color="160,1,44">vörös</a>
+			<a href="#" class="yellow" data-brush_color="250,234,21">sárga</a>
+			<a href="#" class="orange" data-brush_color="253,169,25">narancs</a>
+			<a href="#" class="lightblue" data-brush_color="172,233,248">világoskék</a>
+			<a href="#" class="blue" data-brush_color="20,178,221">kék</a>
+			<a href="#" class="darkblue" data-brush_color="5,63,155">sötétkék</a>
+			<a href="#" class="uvgreen" data-brush_color="148,209,17">UV zöld</a>
+			<a href="#" class="green" data-brush_color="144,184,29">zöld</a>
+			<a href="#" class="darkgreen" data-brush_color="17,167,59">sötétzöld</a>
+		</section>
+		<section id="shadowColors">
+			<h2>Árnyék szín</h2>
+			<a href="#" class="white" data-shadow_color="255,255,255">fehér</a>
+			<a href="#" class="black" data-shadow_color="0,0,0">fekete</a>
+			<a href="#" class="purple" data-shadow_color="128,6,125">lila</a>
+			<a href="#" class="pink" data-shadow_color="247,19,163">rózsaszín</a>
+			<a href="#" class="red" data-shadow_color="237,6,33">piros</a>
+			<a href="#" class="ruddle" data-shadow_color="160,1,44">vörös</a>
+			<a href="#" class="yellow" data-shadow_color="250,234,21">sárga</a>
+			<a href="#" class="orange" data-shadow_color="253,169,25">narancs</a>
+			<a href="#" class="lightblue" data-shadow_color="172,233,248">világoskék</a>
+			<a href="#" class="blue" data-shadow_color="20,178,221">kék</a>
+			<a href="#" class="darkblue" data-shadow_color="5,63,155">sötétkék</a>
+			<a href="#" class="uvgreen" data-shadow_color="148,209,17">UV zöld</a>
+			<a href="#" class="green" data-shadow_color="144,184,29">zöld</a>
+			<a href="#" class="darkgreen" data-shadow_color="17,167,59">sötétzöld</a>
+		</section>
+	</div>
 </body>
 </html>
