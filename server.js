@@ -8,31 +8,30 @@ var
     app = require('http').createServer(httpServerHandler),
     url = require('url'),
     path = require('path'),
-    osc = require('node-osc'),
-//dgram = require('dgram'),
-//udpServer = dgram.createSocket('udp4'),
-    oscServer = new osc.Server(3333, HOST),
+//    osc = require('node-osc'),
+//    oscServer = new osc.Server(3333, HOST),
+    dgram = require('dgram'),
+    udpServer = dgram.createSocket('udp4'),
     io = require('socket.io')(app);
 
 
 // UDP client
-//udpServer.on('message', function (message, remote) {
-//    console.log(remote.address + ':' + remote.port + ' - ' + message);
-//    sendPosition(message);
-//});
-//udpServer.bind(UDPPORT, HOST);
-//console.log('UDP Client running at http://127.0.0.1:' + UDPPORT + '/');
+udpServer.on('message', function (message, remote) {
+    //console.log(remote.address + ':' + remote.port + ' - ', message.toString('ascii'));
+    sendPosition(String.fromCharCode.apply(null, new Uint16Array(message)));
+});
+udpServer.bind(UDPPORT, HOST);
+console.log('UDP Client running at http://' + HOST + ':' + UDPPORT + '/');
 
 // OSC client
-oscServer.on('message', function (message, remote) {
-    //console.log(remote.address + ':' + remote.port + ' - ', message);
-   // var data = (message.substring(message.lastIndexOf('/') + 7)).split(',');
-    sendPosition({"positions": [
-        {"x": message[1], "y": message[2]}
-    ]});
-});
-//oscServer.bind(UDPPORT, HOST);
-console.log('UDP Client running at http://127.0.0.1:' + UDPPORT + '/');
+//oscServer.on('message', function (message, remote) {
+//    //console.log(remote.address + ':' + remote.port + ' - ', message);
+//   // var data = (message.substring(message.lastIndexOf('/') + 7)).split(',');
+//    sendPosition({"positions": [
+//        {"x": message[1], "y": message[2]}
+//    ]});
+//});
+//console.log('OSC Client running at http://' + HOST + ':' + UDPPORT + '/');
 
 
 // HTTP server
@@ -40,7 +39,7 @@ function httpServerHandler(req, res) {
     response(req, res, getMime(url.parse(req.url).pathname));
 }
 app.listen(HTTPPORT, HOST);
-console.log('Server running at http://127.0.0.1:' + HTTPPORT + '/');
+console.log('Server running at http://' + HOST + ':' + HTTPPORT + '/');
 
 
 // Socket.io

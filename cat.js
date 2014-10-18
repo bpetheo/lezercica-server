@@ -18,9 +18,10 @@ $(function () {
         sprite: getSpriteNumber(),
         headRight: $cat.hasClass('flip'),
         lastSittingLeft: null,
+        stamina: 400,
         lazy: false,
         moving: false,
-        canSit: true,
+        tired: false,
         sitting: false,
         sniffing: false,
         standingUp: false,
@@ -39,26 +40,30 @@ $(function () {
         cat.center = (cat.width / 2) + cat.left;
         cat.lookingUp = (($(document).height() - cursor.y) - 100 > cat.top);
         cat.lazy = isLazy();
+        cat.tired = canSitDown();
 
-        var lookingHight = (($(document).height() - cursor.y) - 200 > cat.top);
+        var lookingHigh = (($(document).height() - cursor.y) - 200 > cat.top);
         if (cat.headRight) {
             if (cursor.x > cat.left + cat.width) {
-                cat.lookingDirection = lookingHight ? LOOKING_DIRECTION.TOP_LEFT : LOOKING_DIRECTION.BOTTOM_LEFT;
+                cat.lookingDirection = lookingHigh ? LOOKING_DIRECTION.TOP_LEFT : LOOKING_DIRECTION.BOTTOM_LEFT;
             } else {
-                cat.lookingDirection = lookingHight ? LOOKING_DIRECTION.TOP_RIGHT : LOOKING_DIRECTION.BOTTOM_RIGHT;
+                cat.lookingDirection = lookingHigh ? LOOKING_DIRECTION.TOP_RIGHT : LOOKING_DIRECTION.BOTTOM_RIGHT;
             }
         } else {
             if (cursor.x < cat.left) {
-                cat.lookingDirection = lookingHight ? LOOKING_DIRECTION.TOP_LEFT : LOOKING_DIRECTION.BOTTOM_LEFT;
+                cat.lookingDirection = lookingHigh ? LOOKING_DIRECTION.TOP_LEFT : LOOKING_DIRECTION.BOTTOM_LEFT;
             } else {
-                cat.lookingDirection = lookingHight ? LOOKING_DIRECTION.TOP_RIGHT : LOOKING_DIRECTION.BOTTOM_RIGHT;
+                cat.lookingDirection = lookingHigh ? LOOKING_DIRECTION.TOP_RIGHT : LOOKING_DIRECTION.BOTTOM_RIGHT;
             }
         }
 
         var offset = 3;
         var acceleration = Math.abs(Math.floor((cursor.x - cat.center) / 4));
-        if (acceleration > 50) {
-            acceleration = 50;
+        if (acceleration > 60) {
+            acceleration = 60;
+        }
+        if(cat.tired && acceleration > 30){
+            acceleration = 30;
         }
 
         // moving
@@ -68,6 +73,7 @@ $(function () {
 
                 cat.moving = true;
                 cat.headRight = false;
+                cat.stamina--;
                 $cat.css({
                     'left': cat.left - acceleration
                 });
@@ -76,32 +82,45 @@ $(function () {
 
                 cat.moving = true;
                 cat.headRight = true;
+                cat.stamina--;
                 $cat.css({
                     'left': cat.left + acceleration
                 });
             }
         }
-        if ((Math.abs(cat.center - cursor.x) < offset * 2) && cat.canSit) {
-            // not moving - sitting down
+        cat.tired = canSitDown();
+        if ((Math.abs(cat.center - cursor.x) < cat.width)) {
+            if ((Math.abs(cat.center - cursor.x) < offset * 2)) {
+                // not moving - sitting down
 
-            if (!cat.sitting) {
-                setSprite(43);
-            } else if (cat.sprite < 48) {
-                setSprite(cat.sprite + 1);
+                cat.sniffing = false;
+                if (cat.tired) {
+                    if (!cat.sitting) {
+                        setSprite(43);
+                    } else if (cat.sprite < 48) {
+                        setSprite(cat.sprite + 1);
+                    }
+                }
+            } else if (!cat.tired) {
+
+                cat.moving = false;
+                cat.sniffing = true;
+                cat.sitting = false;
+
+                var rangeMax = 100;
+                var range = Math.abs(cat.center - cursor.x);
+                range = range > rangeMax ? rangeMax : range;
+                var sprites = [67, 69, 70, 71, 72].reverse();
+                var spriteNum = Math.floor(range / (rangeMax / (sprites.length - 1)));
+                console.log(range);
+
+                setSprite(sprites[spriteNum]);
+                //console.log(spriteNum, sprites[spriteNum], range);
+                //console.log(cat.stamina);
+
+                cat.headRight = cursor.x > cat.center;
             }
-        } /*else if ((Math.abs(cat.center - cursor.x) < cat.width)) {
-            cat.moving = false;
-            cat.sniffing = true;
-            cat.sitting = false;
-
-            var rangeMax = 300;
-            var range = Math.abs(cat.center - cursor.x);
-            range = range > rangeMax ? rangeMax : range;
-            var sprites = [67, 68, 69, 70, 71];
-            var spriteNum = (range / rangeMax) / 50;
-
-            setSprite(sprites[spriteNum]);
-        }*/
+        }
 
 
         if (cat.moving) {
@@ -111,16 +130,20 @@ $(function () {
             if (acceleration > offset) {
                 // walking
 
-                if (cat.sprite > 10 && !cat.sitting) {
+                if (cat.sprite > 10 && !cat.sitting && !cat.standingUp) {
                     cat.sprite = 0;
                 }
-                if (!cat.sitting) {
+                if (!cat.sitting && !cat.sniffing) {
                     cat.standingUp = false;
                     cat.lastSittingLeft = null;
                 }
                 if (cat.standingUp) {
                     if (cat.sprite === 43) {
+                        cat.sitting = false;
+                        cat.standingUp = false;
                         setSprite(1);
+                    } else if (cat.sprite > 48) {
+                        setSprite(48);
                     } else {
                         setSprite(cat.sprite - 1);
                     }
@@ -132,7 +155,6 @@ $(function () {
                 // slow-mo
             }
         }
-
 
         if (cat.lazy && cat.sitting) {
             var sprite = 0;
@@ -183,7 +205,7 @@ $(function () {
     }
 
     function isSitting() {
-        if (!cat.canSit) {
+        if (!cat.tired) {
             return false;
         }
         if (cat.lazy) {
@@ -210,25 +232,33 @@ $(function () {
         return false;
     }
 
+    function canSitDown() {
+        if (cat.stamina < 0) {
+            cat.stamina = 0;
+        }
+        return cat.stamina <= 60;
+    }
+
     $(document).on('mousemove', function (event) {
         setCursor(event.pageX, event.pageY);
     });
 
     var socket = io('http://192.168.62.208');
     socket.on('cursorMove', function (data) {
-        setCursor(
-                $(document).width() * (data.positions[0].x / 100),
-                $(document).height() * (data.positions[0].y / 100)
-        );
+        console.log(data);
+//         setCursor(
+//         $(document).width() * (data.positions[0].x / 100),
+//         $(document).height() * (data.positions[0].y / 100)
+//         );
     });
 
     function setCursor(x, y) {
         cursor.x = x;
         cursor.y = y;
         /*$("#cursor").css({
-            "top": x + '%',
-            "left": y + '%'
-        });*/
+         "top": x + '%',
+         "left": y + '%'
+         });*/
     }
 
     setInterval(iteration, 60);
