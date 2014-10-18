@@ -1,24 +1,37 @@
-var
-    fs = require('fs'),
-    app = require('http').createServer(httpServerHandler),
-    url = require('url'),
-    path = require('path'),
-    dgram = require('dgram'),
-    udpServer = dgram.createSocket('udp4'),
-    io = require('socket.io')(app);
-
 var HTTPPORT = 12345;
 var UDPPORT = 12346;
 var HOST = '192.168.62.208';
 var timeout = null;
 
+var
+    fs = require('fs'),
+    app = require('http').createServer(httpServerHandler),
+    url = require('url'),
+    path = require('path'),
+    osc = require('node-osc'),
+//dgram = require('dgram'),
+//udpServer = dgram.createSocket('udp4'),
+    oscServer = new osc.Server(3333, HOST),
+    io = require('socket.io')(app);
+
 
 // UDP client
-udpServer.on('message', function (message, remote) {
-    console.log(remote.address + ':' + remote.port + ' - ' + message);
-    sendPosition(message);
+//udpServer.on('message', function (message, remote) {
+//    console.log(remote.address + ':' + remote.port + ' - ' + message);
+//    sendPosition(message);
+//});
+//udpServer.bind(UDPPORT, HOST);
+//console.log('UDP Client running at http://127.0.0.1:' + UDPPORT + '/');
+
+// OSC client
+oscServer.on('message', function (message, remote) {
+    //console.log(remote.address + ':' + remote.port + ' - ', message);
+   // var data = (message.substring(message.lastIndexOf('/') + 7)).split(',');
+    sendPosition({"positions": [
+        {"x": message[1], "y": message[2]}
+    ]});
 });
-udpServer.bind(UDPPORT, HOST);
+//oscServer.bind(UDPPORT, HOST);
 console.log('UDP Client running at http://127.0.0.1:' + UDPPORT + '/');
 
 
@@ -41,13 +54,13 @@ function send(message, data) {
         console.error('Socket connection is not established! Data not sent...');
     }
 }
-function sendPosition(data){
-    send('cursorMove', JSON.parse(data));
+function sendPosition(data) {
+    send('cursorMove', data);
 
-    if(timeout){
+    if (timeout) {
         clearTimeout(timeout);
     }
-    timeout = setTimeout(function(){
+    timeout = setTimeout(function () {
         send('mouseUp', +(new Date));
         console.log('Mouse movement ended');
     }, 1000);
@@ -56,9 +69,9 @@ io.on('connection', function (socket) {
     socketToEmit = socket;
     console.log('Client detected. Socket tunnel is now open.');
 
-    socket.on('test', function(data){
+    socket.on('test', function (data) {
         //console.log('got test request:', typeof data, data);
-        sendPosition(data);
+        sendPosition(JSON.parse(data));
     })
 });
 console.log('Socket IO running');
@@ -67,17 +80,17 @@ console.log('Socket IO running');
 // Helpers
 function response(req, res, contentType) {
     /*console.log(__dirname + decodeURIComponent(fileName));
-    fs.readFile(__dirname + decodeURIComponent(fileName), 'utf8', function (err, content) {
-        if (content != null && content != '') {
-            res.writeHead(200, {
-                'Content-Length': content.length,
-                'Content-Type': contentType ? contentType : 'text/html',
-                'charset': 'utf-8'
-            });
-            res.write(content);
-        }
-        res.end();
-    });*/
+     fs.readFile(__dirname + decodeURIComponent(fileName), 'utf8', function (err, content) {
+     if (content != null && content != '') {
+     res.writeHead(200, {
+     'Content-Length': content.length,
+     'Content-Type': contentType ? contentType : 'text/html',
+     'charset': 'utf-8'
+     });
+     res.write(content);
+     }
+     res.end();
+     });*/
 
     try {
         console.log('HTTP_REQUEST: ' + req.connection.remoteAddress + ' to URL ' + req.url);
@@ -87,7 +100,7 @@ function response(req, res, contentType) {
             req.url += 'menu.html';
         }
 
-        var targetPath = path.normalize(__dirname + decodeURIComponent( req.url)),
+        var targetPath = path.normalize(__dirname + decodeURIComponent(req.url)),
             extension = path.extname(targetPath).substr(1);
 
         console.log(targetPath);

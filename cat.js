@@ -1,9 +1,3 @@
-/*var socket = io('http://localhost');
- socket.on('cursorMove', function (data) {
- console.log(data.positions);
- });*/
-
-
 $(function () {
     var cursor = {x: 0, y: 0};
     var $cat = $("#cat");
@@ -26,7 +20,9 @@ $(function () {
         lastSittingLeft: null,
         lazy: false,
         moving: false,
+        canSit: true,
         sitting: false,
+        sniffing: false,
         standingUp: false,
         lookingUp: false,
         lookingDirection: null // 1: bal fel, 2: jobb fel, 3: bal le, 4: jobb le
@@ -39,6 +35,7 @@ $(function () {
         cat.sprite = getSpriteNumber();
         cat.headRight = $cat.hasClass('flip');
         cat.sitting = isSitting();
+        cat.sniffing = isSniffing();
         cat.center = (cat.width / 2) + cat.left;
         cat.lookingUp = (($(document).height() - cursor.y) - 100 > cat.top);
         cat.lazy = isLazy();
@@ -84,7 +81,7 @@ $(function () {
                 });
             }
         }
-        if (Math.abs(cat.center - cursor.x) < offset * 2) {
+        if ((Math.abs(cat.center - cursor.x) < offset * 2) && cat.canSit) {
             // not moving - sitting down
 
             if (!cat.sitting) {
@@ -92,7 +89,19 @@ $(function () {
             } else if (cat.sprite < 48) {
                 setSprite(cat.sprite + 1);
             }
-        }
+        } /*else if ((Math.abs(cat.center - cursor.x) < cat.width)) {
+            cat.moving = false;
+            cat.sniffing = true;
+            cat.sitting = false;
+
+            var rangeMax = 300;
+            var range = Math.abs(cat.center - cursor.x);
+            range = range > rangeMax ? rangeMax : range;
+            var sprites = [67, 68, 69, 70, 71];
+            var spriteNum = (range / rangeMax) / 50;
+
+            setSprite(sprites[spriteNum]);
+        }*/
 
 
         if (cat.moving) {
@@ -102,7 +111,6 @@ $(function () {
             if (acceleration > offset) {
                 // walking
 
-                cat.moving = true;
                 if (cat.sprite > 10 && !cat.sitting) {
                     cat.sprite = 0;
                 }
@@ -175,7 +183,10 @@ $(function () {
     }
 
     function isSitting() {
-        if(cat.lazy){
+        if (!cat.canSit) {
+            return false;
+        }
+        if (cat.lazy) {
             return true;
         }
         var sitting = ($.inArray(cat.sprite, [43, 44, 45, 46, 47, 48])) > -1;
@@ -183,6 +194,10 @@ $(function () {
             cat.lastSittingLeft = $cat.position().left;
         }
         return sitting;
+    }
+
+    function isSniffing() {
+        return ($.inArray(cat.sprite, [67, 68, 69, 70, 71])) > -1;
     }
 
     function isLazy() {
@@ -196,8 +211,25 @@ $(function () {
     }
 
     $(document).on('mousemove', function (event) {
-        cursor.x = event.pageX;
-        cursor.y = event.pageY;
+        setCursor(event.pageX, event.pageY);
     });
+
+    var socket = io('http://192.168.62.208');
+    socket.on('cursorMove', function (data) {
+        setCursor(
+                $(document).width() * (data.positions[0].x / 100),
+                $(document).height() * (data.positions[0].y / 100)
+        );
+    });
+
+    function setCursor(x, y) {
+        cursor.x = x;
+        cursor.y = y;
+        /*$("#cursor").css({
+            "top": x + '%',
+            "left": y + '%'
+        });*/
+    }
+
     setInterval(iteration, 60);
 });
