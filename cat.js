@@ -246,10 +246,13 @@ $(function () {
     var socket = io('http://192.168.62.208');
     socket.on('cursorMove', function (data) {
         console.log(data);
-//         setCursor(
-//         $(document).width() * (data.positions[0].x / 100),
-//         $(document).height() * (data.positions[0].y / 100)
-//         );
+        if(typeof data === 'string'){
+            data = JSON.parse(data);
+        }
+         setCursor(
+         $(document).width() * (data.positions[0].x / 100),
+         $(document).height() * (data.positions[0].y / 100)
+         );
     });
 
     function setCursor(x, y) {

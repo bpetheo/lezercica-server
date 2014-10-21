@@ -146,7 +146,6 @@
                     drawing = false;
                     context.closePath();
 
-                    console.log(element)
 
                     var rgb = $(element).data('brush_color').split(',');
 
@@ -244,8 +243,8 @@
 
 
                 drawLine(data.positions[0]);
-
                 prevDotCoords = data.positions[0];
+
             });
 
             socket.on('mouseUp', function () {
@@ -286,9 +285,6 @@
     <a href="#" class="red" data-brush_color="237,6,33">piros</a>
     <a href="#" class="orange" data-brush_color="253,169,25">narancs</a>
     <a href="#" class="yellow" data-brush_color="250,234,21">sárga</a>
-    <a href="#" class="uvgreen" data-brush_color="148,209,17">UV zöld</a>
-    <a href="#" class="green" data-brush_color="144,184,29">zöld</a>
-    <a href="#" class="darkgreen" data-brush_color="17,167,59">sötétzöld</a>
     <a href="#" class="lightblue" data-brush_color="172,233,248">világoskék</a>
     <a href="#" class="blue" data-brush_color="20,178,221">kék</a>
     <a href="#" class="darkblue" data-brush_color="5,63,155">sötétkék</a>
